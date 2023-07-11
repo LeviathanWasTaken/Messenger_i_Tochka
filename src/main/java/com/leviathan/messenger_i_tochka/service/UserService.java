@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +24,7 @@ public class UserService {
         return userRepo.findByUsername(username);
     }
 
+    @Transactional
     public void createNewUser(RegistrationUserDto registrationUserDto) throws UserAlreadyExistException {
         if (findByUsername(registrationUserDto.getUsername()).isPresent()) {
             throw new UserAlreadyExistException("User with username " + registrationUserDto.getUsername() + " already exist");
