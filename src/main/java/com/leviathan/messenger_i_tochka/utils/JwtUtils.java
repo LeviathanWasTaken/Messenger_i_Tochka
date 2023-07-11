@@ -1,8 +1,11 @@
 package com.leviathan.messenger_i_tochka.utils;
 
+import com.leviathan.messenger_i_tochka.exception.JwtBlacklistedException;
+import com.leviathan.messenger_i_tochka.repository.JwtBlacklistedRepo;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,12 +18,15 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class JwtUtils {
     @Value("${jwt.secret}")
     private String secret;
 
     @Value("${jwt.lifetime}")
     private Duration tokenLifetime;
+
+    private final JwtBlacklistedRepo jwtBlacklistedRepo;
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
@@ -39,7 +45,8 @@ public class JwtUtils {
                 .compact();
     }
 
-    public String getUsernameFromToken(String token) {
+    public String getUsernameFromToken(String token) throws JwtBlacklistedException {
+        if (jwtBlacklistedRepo.findById(token).isPresent()) throw new JwtBlacklistedException("Invalid token");
         return getAllClaimsFromToken(token).getSubject();
     }
 

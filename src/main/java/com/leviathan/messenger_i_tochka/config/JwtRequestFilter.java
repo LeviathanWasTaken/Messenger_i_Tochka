@@ -1,5 +1,6 @@
 package com.leviathan.messenger_i_tochka.config;
 
+import com.leviathan.messenger_i_tochka.exception.JwtBlacklistedException;
 import com.leviathan.messenger_i_tochka.utils.JwtUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
@@ -40,8 +41,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 username = jwtUtils.getUsernameFromToken(jwt);
             } catch (ExpiredJwtException e) {
                 log.debug("Jwt expired");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             } catch (SignatureException e) {
                 log.debug("Wrong signature");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            } catch (JwtBlacklistedException e) {
+                log.debug("Token is in blacklist");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
         }
 
