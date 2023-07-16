@@ -25,8 +25,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JwtRequestFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
-
-
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
@@ -41,7 +39,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 username = jwtUtils.getUsernameFromToken(jwt);
             } catch (ExpiredJwtException e) {
                 log.debug("Jwt expired");
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             } catch (SignatureException e) {
                 log.debug("Wrong signature");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

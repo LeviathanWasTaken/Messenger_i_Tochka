@@ -1,15 +1,17 @@
 package com.leviathan.messenger_i_tochka.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
-@Data
-@Table(name = "roles")
+@Table(name = "channel_permissions")
 @NoArgsConstructor
-public class ApplicationRole {
+@AllArgsConstructor
+@Data
+public class ChannelPermission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

@@ -1,7 +1,6 @@
 package com.leviathan.messenger_i_tochka.config;
 
 import com.leviathan.messenger_i_tochka.service.UserDetailsService;
-import com.leviathan.messenger_i_tochka.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
@@ -30,9 +29,8 @@ public class SecurityConfig {
                 .csrf().disable()
                 .cors().disable()
                 .authorizeHttpRequests()
-                .antMatchers("/secured").authenticated()
-                .antMatchers("/admin").hasRole("ADMIN")
-                .antMatchers("/user-info").authenticated()
+                .antMatchers("/api/auth", "/api/auth/registration").permitAll()
+                .antMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

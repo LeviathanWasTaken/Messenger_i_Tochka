@@ -11,9 +11,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,7 +24,7 @@ public class AuthController {
     private final UserService userService;
     private final AuthService authService;
 
-    @PostMapping("/auth")
+    @PostMapping("/api/auth")
     public ResponseEntity<?> createAuthToken(@RequestBody JwtRequest authRequest) {
         String token;
         try {
@@ -32,7 +35,7 @@ public class AuthController {
         return ResponseEntity.ok(new JwtResponse(token));
     }
 
-    @PostMapping("/registration")
+    @PostMapping("/api/auth/registration")
     public ResponseEntity<?> createNewUser(@RequestBody RegistrationUserDto registrationUserDto) {
         try {
             userService.createNewUser(registrationUserDto);
@@ -40,6 +43,12 @@ public class AuthController {
             return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/api/auth/logout")
+    public ResponseEntity<?> blacklistTokens(Principal principal) {
+        authService.blacklistTokens(principal.getName());
+        return ResponseEntity.ok().build();
     }
 
 }
