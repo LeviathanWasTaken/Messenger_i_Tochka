@@ -49,11 +49,7 @@ public class ChatService {
             ));
         }
 
-        //In case crazy shit happens and generated UUID exists in DB (better to overplan than underplan)
         UUID chatId = UUID.randomUUID();
-        while (chatRepo.findById(chatId).isPresent()) {
-            chatId = UUID.randomUUID();
-        }
 
         Chat chat = Chat.builder()
                 .id(chatId)
