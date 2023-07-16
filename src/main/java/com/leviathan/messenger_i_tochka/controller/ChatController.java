@@ -34,9 +34,8 @@ public class ChatController {
     }
 
     @PostMapping("/api/chats")
-    public ResponseEntity<?> startChatWithUser(@RequestBody ChatCreationRequest chatCreationRequest, Principal principal) {
-        List<String> membersUsernames = new ArrayList<>();
-        membersUsernames.add(chatCreationRequest.getReceiverUsername());
+    public ResponseEntity<?> startChatWithUsers(@RequestBody ChatCreationRequest chatCreationRequest, Principal principal) {
+        List<String> membersUsernames = new ArrayList<>(chatCreationRequest.getMembersUsernames());
         membersUsernames.add(principal.getName());
         UUID createdChatUUID;
         try {
