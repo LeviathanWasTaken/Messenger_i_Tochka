@@ -3,6 +3,7 @@ package com.leviathan.messenger_i_tochka.controller;
 import com.leviathan.messenger_i_tochka.dto.ChatCreationRequest;
 import com.leviathan.messenger_i_tochka.dto.ChatCreationResponse;
 import com.leviathan.messenger_i_tochka.dto.MessageDto;
+import com.leviathan.messenger_i_tochka.exception.AppError;
 import com.leviathan.messenger_i_tochka.exception.ChatAlreadyExistException;
 import com.leviathan.messenger_i_tochka.exception.ChatNotFoundException;
 import com.leviathan.messenger_i_tochka.exception.MessageNotFoundException;
@@ -29,7 +30,7 @@ public class ChatController {
         try {
             return ResponseEntity.ok(chatService.getAllChatsForUser(principal.getName()));
         } catch (UsernameNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
     }
 
@@ -41,7 +42,7 @@ public class ChatController {
         try {
             createdChatUUID = chatService.createNewChat(membersUsernames);
         } catch (UsernameNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         } catch (ChatAlreadyExistException e) {
             return ResponseEntity.ok(new ChatCreationResponse(UUID.fromString(e.getMessage())));
         }
@@ -54,7 +55,7 @@ public class ChatController {
         try{
             chatService.createNewMessage(message, chatId);
         } catch (ChatNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -66,7 +67,7 @@ public class ChatController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             return ResponseEntity.ok(chatService.getChat(chatId, PageRequest.of(page, messagesAmount)));
         } catch (ChatNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
     }
 
@@ -77,7 +78,7 @@ public class ChatController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             return ResponseEntity.ok(chatService.getNewMessages(chatId, lastMessageId));
         } catch (ChatNotFoundException | MessageNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
     }
 

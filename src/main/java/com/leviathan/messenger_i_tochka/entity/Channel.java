@@ -1,25 +1,28 @@
 package com.leviathan.messenger_i_tochka.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "channels")
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Channel {
     @Id
-    @Column(name = "tag")
-    private String tag;
-    @Column(name = "name")
-    private String name;
+    @Column(name = "tag", nullable = false, unique = true)
+    String tag;
+    @Column(name = "name", nullable = false)
+    String name;
     @OneToMany(mappedBy = "channel")
-    private Set<ChannelMember> members;
+    List<ChannelRole> channelRoles;
     @OneToMany(mappedBy = "channel")
-    private Set<ChannelMessage> messageHistory;
+    List<ChannelMember> members;
     @OneToMany(mappedBy = "channel")
-    private Set<ChannelRole> channelRoles;
+    List<ChannelMessage> messageHistory;
 }

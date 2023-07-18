@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -37,6 +38,9 @@ public class User {
     @ElementCollection(targetClass = String.class, fetch = FetchType.LAZY)
     @Column(name = "token", nullable = false)
     private Set<String> tokens;
+
+    @OneToMany(mappedBy = "user")
+    private List<ChannelMember> memberList;
 
     public void addToken(String token) {
         this.tokens.add(token);

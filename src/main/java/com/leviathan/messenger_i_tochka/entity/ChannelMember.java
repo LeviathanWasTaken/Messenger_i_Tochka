@@ -1,31 +1,29 @@
 package com.leviathan.messenger_i_tochka.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "channel_members")
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChannelMember {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    Long id;
     @ManyToOne
-    private User user;
+    User user;
     @ManyToOne
-    private Channel channel;
+    Channel channel;
     @ManyToMany
-    @JoinTable(
-            name = "channel_members_channel_roles",
-            joinColumns = @JoinColumn(name = "channel_members_id"),
-            inverseJoinColumns = @JoinColumn(name = "channel_roles_id")
-    )
-    private Set<ChannelRole> roles;
+    List<ChannelRole> roles;
+    @OneToMany(mappedBy = "author")
+    List<ChannelMessage> messages;
 }

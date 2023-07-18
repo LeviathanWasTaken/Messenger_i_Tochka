@@ -1,7 +1,7 @@
 package com.leviathan.messenger_i_tochka.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -11,16 +11,19 @@ import java.util.UUID;
 @Table(name = "channel_messages")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChannelMessage {
     @Id
     @Column(name = "id")
-    private UUID id;
+    UUID id;
     @ManyToOne
-    private ChannelMember author;
+    ChannelMember author;
     @ManyToOne
-    private Channel channel;
+    Channel channel;
     @Column(name = "content", nullable = false)
-    private String content;
+    String content;
     @Column(name = "timestamp")
-    private Date timestamp;
+    Date timestamp;
 }
