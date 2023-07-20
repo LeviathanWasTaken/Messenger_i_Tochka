@@ -25,4 +25,12 @@ public class SystemMessages {
      public static String getUserLeftChannelMessage(String username) {
          return String.format(USER_LEFT_CHANNEL_TEMPLATE, username);
      }
+
+     public static String getUserJoinChatTemplate(String username) {
+         return String.format(USER_JOIN_CHAT_TEMPLATE, username);
+     }
+
+    public static String getUserLeftChatTemplate(String username) {
+        return String.format(USER_LEFT_CHAT_TEMPLATE, username);
+    }
 }

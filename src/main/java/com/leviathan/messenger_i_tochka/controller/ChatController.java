@@ -1,5 +1,6 @@
 package com.leviathan.messenger_i_tochka.controller;
 
+import com.leviathan.messenger_i_tochka.dto.ChatAddUsersRequest;
 import com.leviathan.messenger_i_tochka.dto.ChatCreationRequest;
 import com.leviathan.messenger_i_tochka.dto.ChatCreationResponse;
 import com.leviathan.messenger_i_tochka.dto.MessageDto;
@@ -73,6 +74,29 @@ public class ChatController {
             if (!chatService.isUserParticipateInChat(chatId, principal.getName()))
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             return ResponseEntity.ok(chatService.getNewMessages(chatId, lastMessageId));
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+        }
+    }
+
+    @PutMapping("/api/chats/{chatId}/add")
+    public ResponseEntity<?> addUsersToChat(@PathVariable UUID chatId, @RequestBody ChatAddUsersRequest addUsersRequest, Principal principal) {
+        addUsersRequest.setChatId(chatId);
+        try {
+            if (chatService.isUserParticipateInChat(chatId, principal.getName())) {
+                chatService.addUsersToChat(addUsersRequest);
+                return ResponseEntity.ok().build();
+            } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+        }
+    }
+
+    @GetMapping("/api/chats/{chatId}/leave")
+    public ResponseEntity<?> leaveChat(@PathVariable UUID chatId, Principal principal) {
+        try {
+            chatService.removeUserFromChat(principal.getName(), chatId);
+            return ResponseEntity.ok().build();
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }

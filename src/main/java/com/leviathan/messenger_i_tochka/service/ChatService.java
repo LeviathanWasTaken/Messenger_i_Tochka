@@ -1,5 +1,6 @@
 package com.leviathan.messenger_i_tochka.service;
 
+import com.leviathan.messenger_i_tochka.dto.ChatAddUsersRequest;
 import com.leviathan.messenger_i_tochka.dto.ChatResponse;
 import com.leviathan.messenger_i_tochka.dto.ChatShortResponse;
 import com.leviathan.messenger_i_tochka.dto.MessageDto;
@@ -9,6 +10,7 @@ import com.leviathan.messenger_i_tochka.entity.User;
 import com.leviathan.messenger_i_tochka.exception.NotFoundException;
 import com.leviathan.messenger_i_tochka.repository.ChatMessageRepo;
 import com.leviathan.messenger_i_tochka.repository.ChatRepo;
+import com.leviathan.messenger_i_tochka.utils.SystemMessages;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -55,10 +57,7 @@ public class ChatService {
                 .messageHistory(Collections.emptyList())
                 .build();
         chatRepo.save(chat);
-        createNewMessage(MessageDto.builder()
-                .authorUsername("System")
-                .content("Chat was created")
-                .build(), chatId);
+        sendSystemMessage(SystemMessages.getChatCreatedMessage(membersUsernames), chat);
         return chatId;
     }
 
@@ -102,6 +101,19 @@ public class ChatService {
         chatMessageRepo.save(chatMessage);
     }
 
+    @Transactional
+    public void sendSystemMessage(String content, Chat chat) {
+        User system = userService.findByUsername("System").get();
+        ChatMessage message = ChatMessage.builder()
+                .id(UUID.randomUUID())
+                .chat(chat)
+                .author(system)
+                .content(content)
+                .timestamp(new Date())
+                .build();
+        chatMessageRepo.save(message);
+    }
+
     public ChatResponse getChat(UUID chatId, Pageable pageable) throws NotFoundException {
         Chat chat = findChatById(chatId);
         return ChatResponse.builder()
@@ -132,5 +144,32 @@ public class ChatService {
                                 .timestamp(messageFromDb.getTimestamp())
                                 .build()
                 ).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void addUsersToChat(ChatAddUsersRequest addUsersRequest) throws NotFoundException {
+        Chat chat = findChatById(addUsersRequest.getChatId());
+        List<User> users = chat.getMembers();
+        for (String username : addUsersRequest.getUsernames()) {
+            users.add(userService.findByUsername(username).orElseThrow(
+                    () -> new NotFoundException("User with username " + username + " doesn't exist")
+            ));
+            sendSystemMessage(SystemMessages.getUserJoinChatTemplate(username), chat);
+        }
+        chat.setMembers(users);
+        chatRepo.save(chat);
+    }
+
+    @Transactional
+    public void removeUserFromChat(String username, UUID chatId) throws NotFoundException {
+        Chat chat = findChatById(chatId);
+        User user = userService.findByUsername(username).orElseThrow(
+                () -> new NotFoundException("User with username " + username + " doesn't exist")
+        );
+        if (!chat.getMembers().contains(user)) throw new NotFoundException("User " + username + " doesn't participate in chat " + chatId);
+        chat.getMembers().remove(user);
+        chatRepo.save(chat);
+        sendSystemMessage(SystemMessages.getUserLeftChatTemplate(username), chat);
+        if (chat.getMembers().isEmpty()) chatRepo.delete(chat);
     }
 }
