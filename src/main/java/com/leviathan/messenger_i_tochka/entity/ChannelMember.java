@@ -22,8 +22,17 @@ public class ChannelMember {
     User user;
     @ManyToOne
     Channel channel;
+    @Column(name = "active", columnDefinition = "boolean default true")
+    Boolean isActive;
     @ManyToMany
+    @JoinTable(
+            name = "channel_members_roles",
+            joinColumns = @JoinColumn(name = "channel_members_id"),
+            inverseJoinColumns = @JoinColumn(name = "channel_roles_id")
+    )
     List<ChannelRole> roles;
     @OneToMany(mappedBy = "author")
     List<ChannelMessage> messages;
+    @OneToMany(mappedBy = "creator")
+    List<ChannelInvite> invites;
 }

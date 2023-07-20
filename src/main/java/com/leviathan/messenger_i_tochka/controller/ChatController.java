@@ -4,9 +4,7 @@ import com.leviathan.messenger_i_tochka.dto.ChatCreationRequest;
 import com.leviathan.messenger_i_tochka.dto.ChatCreationResponse;
 import com.leviathan.messenger_i_tochka.dto.MessageDto;
 import com.leviathan.messenger_i_tochka.exception.AppError;
-import com.leviathan.messenger_i_tochka.exception.ChatAlreadyExistException;
-import com.leviathan.messenger_i_tochka.exception.ChatNotFoundException;
-import com.leviathan.messenger_i_tochka.exception.MessageNotFoundException;
+import com.leviathan.messenger_i_tochka.exception.NotFoundException;
 import com.leviathan.messenger_i_tochka.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +27,7 @@ public class ChatController {
     public ResponseEntity<?> getAllChats(Principal principal) {
         try {
             return ResponseEntity.ok(chatService.getAllChatsForUser(principal.getName()));
-        } catch (UsernameNotFoundException e) {
+        } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
     }
@@ -41,12 +39,10 @@ public class ChatController {
         UUID createdChatUUID;
         try {
             createdChatUUID = chatService.createNewChat(membersUsernames);
-        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ChatCreationResponse(createdChatUUID));
+        } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
-        } catch (ChatAlreadyExistException e) {
-            return ResponseEntity.ok(new ChatCreationResponse(UUID.fromString(e.getMessage())));
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ChatCreationResponse(createdChatUUID));
     }
 
     @PostMapping("/api/chats/{chatId}")
@@ -54,7 +50,7 @@ public class ChatController {
         message.setAuthorUsername(principal.getName());
         try{
             chatService.createNewMessage(message, chatId);
-        } catch (ChatNotFoundException e) {
+        } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -66,7 +62,7 @@ public class ChatController {
             if (!chatService.isUserParticipateInChat(chatId, principal.getName()))
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             return ResponseEntity.ok(chatService.getChat(chatId, PageRequest.of(page, messagesAmount)));
-        } catch (ChatNotFoundException e) {
+        } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
     }
@@ -77,7 +73,7 @@ public class ChatController {
             if (!chatService.isUserParticipateInChat(chatId, principal.getName()))
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             return ResponseEntity.ok(chatService.getNewMessages(chatId, lastMessageId));
-        } catch (ChatNotFoundException | MessageNotFoundException e) {
+        } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
     }

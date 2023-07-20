@@ -5,9 +5,12 @@ import com.leviathan.messenger_i_tochka.entity.ChannelMessage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 public interface ChannelMessageRepo extends JpaRepository<ChannelMessage, UUID> {
     List<ChannelMessage> findAllByChannelOrderByTimestampDesc(Channel channel, Pageable pageable);
+
+    List<ChannelMessage> findAllByChannelAndTimestampGreaterThanOrderByTimestamp(Channel channel, Date timestamp);
 }

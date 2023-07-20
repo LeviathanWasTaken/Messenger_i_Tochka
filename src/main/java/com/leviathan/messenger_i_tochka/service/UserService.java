@@ -3,7 +3,7 @@ package com.leviathan.messenger_i_tochka.service;
 import com.leviathan.messenger_i_tochka.dto.RegistrationUserDto;
 import com.leviathan.messenger_i_tochka.dto.UsersResponse;
 import com.leviathan.messenger_i_tochka.entity.User;
-import com.leviathan.messenger_i_tochka.exception.UserAlreadyExistException;
+import com.leviathan.messenger_i_tochka.exception.AlreadyExistException;
 import com.leviathan.messenger_i_tochka.repository.ApplicationRoleRepo;
 import com.leviathan.messenger_i_tochka.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
@@ -37,9 +37,9 @@ public class UserService {
     }
 
     @Transactional
-    public void createNewUser(RegistrationUserDto registrationUserDto) throws UserAlreadyExistException {
+    public void createNewUser(RegistrationUserDto registrationUserDto) throws AlreadyExistException {
         if (findByUsername(registrationUserDto.getUsername()).isPresent()) {
-            throw new UserAlreadyExistException("User with username " + registrationUserDto.getUsername() + " already exist");
+            throw new AlreadyExistException("User with username " + registrationUserDto.getUsername() + " already exist");
         }
         User user = new User();
         user.setEmail(registrationUserDto.getEmail());

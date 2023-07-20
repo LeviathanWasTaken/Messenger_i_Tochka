@@ -22,8 +22,6 @@ public class ChannelRole {
     String name;
     @ManyToOne
     Channel channel;
-    @ManyToMany
-    List<ChannelMember> members;
     @ElementCollection
     @CollectionTable(name = "channel_roles_permissions", joinColumns = @JoinColumn(name = "channel_roles_id"))
     List<ChannelPermission> permissions;

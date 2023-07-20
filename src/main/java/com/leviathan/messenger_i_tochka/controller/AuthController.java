@@ -3,8 +3,8 @@ package com.leviathan.messenger_i_tochka.controller;
 import com.leviathan.messenger_i_tochka.dto.JwtRequest;
 import com.leviathan.messenger_i_tochka.dto.JwtResponse;
 import com.leviathan.messenger_i_tochka.dto.RegistrationUserDto;
+import com.leviathan.messenger_i_tochka.exception.AlreadyExistException;
 import com.leviathan.messenger_i_tochka.exception.AppError;
-import com.leviathan.messenger_i_tochka.exception.UserAlreadyExistException;
 import com.leviathan.messenger_i_tochka.service.AuthService;
 import com.leviathan.messenger_i_tochka.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class AuthController {
     public ResponseEntity<?> createNewUser(@RequestBody RegistrationUserDto registrationUserDto) {
         try {
             userService.createNewUser(registrationUserDto);
-        } catch (UserAlreadyExistException e) {
+        } catch (AlreadyExistException e) {
             return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.status(HttpStatus.CREATED).build();

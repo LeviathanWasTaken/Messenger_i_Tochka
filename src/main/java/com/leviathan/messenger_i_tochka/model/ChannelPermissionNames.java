@@ -1,5 +1,5 @@
 package com.leviathan.messenger_i_tochka.model;
 
 public enum ChannelPermissionNames {
-    SEND_MESSAGES, EDIT_CHANNEL, MANAGE_MEMBERS
+    SEND_MESSAGES, EDIT_CHANNEL, MANAGE_MEMBERS, CREATE_INVITES
 }
