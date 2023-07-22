@@ -16,20 +16,21 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/channels")
 public class ChannelController {
     private final ChannelService channelService;
 
-    @GetMapping("/api/channel/public")
+    @GetMapping("/public")
     public ResponseEntity<?> getPublicChannelsList() {
         return ResponseEntity.ok(channelService.getAllPublicChannels());
     }
 
-    @GetMapping("/api/channel")
+    @GetMapping
     public ResponseEntity<?> getChannelsListForUser(Principal principal) {
         return ResponseEntity.ok(channelService.getAllChannelsForUser(principal.getName()));
     }
 
-    @PostMapping("/api/channel")
+    @PostMapping
     public ResponseEntity<?> createChannel(Principal principal, @RequestBody ChannelCreationRequest creationRequest) {
         creationRequest.setCreatorUsername(principal.getName());
         try {
@@ -40,7 +41,7 @@ public class ChannelController {
         }
     }
 
-    @GetMapping("/api/channel/join/{tag}")
+    @GetMapping("/join/{tag}")
     public ResponseEntity<?> joinChannel(@PathVariable String tag, Principal principal) {
         try {
             channelService.joinChannel(principal.getName(), tag);
@@ -52,7 +53,7 @@ public class ChannelController {
         }
     }
 
-    @GetMapping("/api/channel/invite/{inviteId}")
+    @GetMapping("/invite-info/{inviteId}")
     public ResponseEntity<?> getInviteInfo(@PathVariable UUID inviteId) {
         try {
             return ResponseEntity.ok(channelService.getInviteInfo(inviteId));
@@ -61,7 +62,7 @@ public class ChannelController {
         }
     }
 
-    @GetMapping("/api/channel/join")
+    @GetMapping("/join")
     public ResponseEntity<?> joinChannelByInvite(@RequestParam UUID inviteId, Principal principal) {
         try {
             channelService.joinChannelByInvite(principal.getName(), inviteId);
@@ -73,7 +74,7 @@ public class ChannelController {
         }
     }
 
-    @GetMapping("/api/channel/{tag}")
+    @GetMapping("/{tag}")
     public ResponseEntity<?> getChannel(@PathVariable String tag,
                                         @RequestParam(required = false, defaultValue = "0") int page,
                                         @RequestParam(required = false, defaultValue = "20") int messagesAmount,
@@ -91,7 +92,7 @@ public class ChannelController {
         }
     }
 
-    @PostMapping("/api/channel/{tag}")
+    @PostMapping("/{tag}")
     public ResponseEntity<?> sendMessage(@PathVariable String tag, @RequestBody MessageDto message, Principal principal) {
         message.setAuthorUsername(principal.getName());
         try {
@@ -106,7 +107,7 @@ public class ChannelController {
         }
     }
 
-    @GetMapping("/api/channel/{tag}/refresh")
+    @GetMapping("/{tag}/refresh")
     public ResponseEntity<?> refreshChannel(@PathVariable String tag, @RequestParam UUID lastMessageId, Principal principal) {
         try {
             if (channelService.isUserParticipateInChannel(principal.getName(), tag)) {
@@ -117,7 +118,7 @@ public class ChannelController {
         }
     }
 
-    @GetMapping("/api/channel/{tag}/leave")
+    @GetMapping("/{tag}/leave")
     public ResponseEntity<?> leaveChannel(@PathVariable String tag, Principal principal) {
         try {
             channelService.removeMemberFromChannel(principal.getName(), tag);
@@ -127,7 +128,7 @@ public class ChannelController {
         }
     }
 
-    @GetMapping("/api/channel/{tag}/kick/{username}")
+    @GetMapping("/{tag}/kick/{username}")
     public ResponseEntity<?> kickMember(@PathVariable String tag, @PathVariable String username, Principal principal) {
         try {
             channelService.kickMember(tag, principal.getName(), username);
@@ -139,7 +140,7 @@ public class ChannelController {
         }
     }
 
-    @PostMapping("/api/channel/{tag}/createInvite")
+    @PostMapping("/{tag}/create-invite")
     public ResponseEntity<?> createChannelInvite(@PathVariable String tag, Principal principal) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(channelService.createChannelInvite(tag, principal.getName()));
